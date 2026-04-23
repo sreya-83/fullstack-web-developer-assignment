@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+  <link rel="stylesheet" href="css/style1.css">
+</head>
+
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+
+function Dashboard(){
+   const [messages, setMessages] = React.useState([]);
+  React.useEffect(() => {
+  const user = localStorage.getItem("user");
+
+  if(!user){
+    window.location.href = "index.html";
+  }
+}, []);
+
+
+  React.useEffect(() => {
+    fetch("getMessages.php")
+      .then(res => res.json())
+      .then(data => setMessages(data));
+  }, []);
+const handleLogout = () => {
+  localStorage.removeItem("user");
+  window.location.href = "index.html";
+};
+  return (
+    <div className="dashboard">
+
+      <aside className="sidebar">
+        <h2 className="logo">My<span>Admin</span></h2>
+      </aside>
+
+      <div className="main">
+
+        <header className="topbar">
+          <h2>Dashboard</h2>
+          <div style={{display:"flex", gap:"10px", alignItems:"center"}}>
+  <p>Welcome {localStorage.getItem("user")}</p>
+  <button className="logout" onClick={handleLogout}>Logout</button>
+</div>
+        </header>
+
+        <section className="cards">
+          <div className="card"><h3>Messages</h3><p>{messages.length}</p></div>
+        </section>
+
+        <section className="table-section">
+          <h3>Recent Messages</h3>
+
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Message</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {messages.map((m,i) => (
+                <tr key={i}>
+                  <td>{m.name}</td>
+                  <td>{m.email}</td>
+                  <td>{m.message}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+        </section>
+
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<Dashboard />);
+
+</script>
+
+</body>
+</html>

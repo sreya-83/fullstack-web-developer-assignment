@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TRUSLYTICS CONSULTING</title>
+
+  <!-- React CDN -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+
+function App() {
+
+  // ✅ STATES
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [loginOpen, setLoginOpen] = React.useState(false);
+  const [registerOpen, setRegisterOpen] = React.useState(false);
+
+  // ✅ CONTACT FORM
+  const handleContact = (e) => {
+    e.preventDefault();
+
+    fetch("contact.php", {
+      method: "POST",
+      body: new FormData(e.target)
+    })
+    .then(res => res.json())
+    .then(() => {
+      alert("Message Sent");
+      e.target.reset();
+    });
+  };
+
+  // ✅ LOGIN
+  const handleLogin = (e) => {
+    e.preventDefault();
+
+    fetch("login.php", {
+      method: "POST",
+      body: new FormData(e.target)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if(data.status === "success"){
+        localStorage.setItem("user", data.username);
+        window.location.href = "dashboard.html";
+      } else {
+        alert(data.message);
+      }
+    });
+  };
+
+  // ✅ REGISTER
+  const handleRegister = (e) => {
+    e.preventDefault();
+
+    fetch("register.php", {
+      method: "POST",
+      body: new FormData(e.target)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if(data.status === "success"){
+        alert("Registered Successfully");
+        setRegisterOpen(false);
+        setLoginOpen(true);
+      } else {
+        alert(data.message);
+      }
+    });
+  };
+
+  return (
+    <div>
+
+      {/* HEADER */}
+      <header>
+        <h1 className="logo">TRUSLYTICS CONSULTING</h1>
+
+        {/* ✅ TOGGLE BUTTON */}
+        <div className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)}>
+          ☰
+        </div>
+
+        {/* ✅ NAV */}
+        <nav className={menuOpen ? "active" : ""}>
+          <a href="#">Home</a>
+          <a href="#about">About</a>
+          <a href="#contact">Contact</a>
+          <button onClick={() => setLoginOpen(true)}>Login</button>
+          <button onClick={() => setRegisterOpen(true)}>Register</button>
+        </nav>
+      </header>
+
+      {/* ABOUT */}
+      <section id="about" className="about-section">
+        <div className="about-overlay">
+          <div className="about-container">
+
+            <div className="about-content">
+              <h2 className="about-heading">
+                About <span>Our Platform</span>
+              </h2>
+              <p>
+                We provide a modern and secure solution to manage your business operations.
+              </p>
+            </div>
+
+            <div className="about-features">
+              <div className="feature-box">
+                <h4>Secure System</h4>
+                <p>Advanced authentication and safe data storage.</p>
+              </div>
+
+              <div className="feature-box">
+                <h4>Fast Performance</h4>
+                <p>Optimized backend and lightweight frontend.</p>
+              </div>
+
+              <div className="feature-box">
+                <h4>Easy Dashboard</h4>
+                <p>Simple UI for managing users and data.</p>
+              </div>
+
+              <div className="feature-box">
+                <h4>Contact Handling</h4>
+                <p>Store and manage customer messages efficiently.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* CONTACT */}
+      <section className="contact" id="contact">
+        <div className="contact-container">
+
+          <h2 className="contact-heading">
+            Contact <span>Us</span>
+          </h2>
+
+          <form onSubmit={handleContact}>
+            <div className="input-box">
+              <input name="name" required />
+              <label>Name</label>
+            </div>
+
+            <div className="input-box">
+              <input name="email" required />
+              <label>Email</label>
+            </div>
+
+            <div className="input-box">
+              <textarea name="message" required></textarea>
+              <label>Message</label>
+            </div>
+
+            <button className="contact-btn">Send Message</button>
+          </form>
+
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="small-footer">
+        <p>© 2026 MyBrand. All Rights Reserved.</p>
+      </footer>
+
+      {/* LOGIN MODAL */}
+      {loginOpen && (
+        <div className="modal active">
+          <div className="modal-content">
+            <span onClick={() => setLoginOpen(false)}>&times;</span>
+            <h2>Login</h2>
+
+            <form onSubmit={handleLogin}>
+              <input name="username" placeholder="Email" required />
+              <input name="password" type="password" placeholder="Password" required />
+              <button className="modal-button">Login</button>
+            </form>
+
+            <p>
+              New user?{" "}
+              <a onClick={() => {
+                setLoginOpen(false);
+                setRegisterOpen(true);
+              }}>Register</a>
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* REGISTER MODAL */}
+      {registerOpen && (
+        <div className="modal active">
+          <div className="modal-content">
+            <span onClick={() => setRegisterOpen(false)}>&times;</span>
+            <h2>Register</h2>
+
+            <form onSubmit={handleRegister}>
+              <input name="name" placeholder="Name" required />
+              <input name="username" placeholder="Email" required />
+              <input name="password" type="password" placeholder="Password" required />
+              <button className="modal-button">Register</button>
+            </form>
+
+            <p>
+              Already have account?{" "}
+              <a onClick={() => {
+                setRegisterOpen(false);
+                setLoginOpen(true);
+              }}>Login</a>
+            </p>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+// RENDER
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+</script>
+
+</body>
+</html>
